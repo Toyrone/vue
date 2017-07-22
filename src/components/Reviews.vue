@@ -1,13 +1,13 @@
 <template>
   <div class="container">
-    <h4 class= "uppercase">reviews</h4>
+    <h4 class= "uppercase">Reviews</h4>
     <div class="review" v-for="review in reviews">
       <p>{{ review.content }}</p>
       <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-3">
           <h5>{{ review.reviewer }}</h5>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-2">
           <h5 class="pull-right">{{ reviews.time }}</h5>
         </div>
       </div>
@@ -29,6 +29,10 @@
 </template>
 
 <script>
+// npm install -S pusher-js
+
+  import Pusher from 'pusher-js'
+
   const MOCK_REVIEWS = [
     {
       movie_id: 7128,
@@ -53,6 +57,7 @@
     methods: {
       addReview () {
         if (!this.movie || !this.review.reviewer || !this.review.content) {
+          alert('Please make sure all fields are not empty');
           return
         }
         let review = {
@@ -61,8 +66,22 @@
           reviewer: this.review.reviewer,
           time: new Date().toLocaleDateString()
         }
-        this.mockReviews.unshift(review)
-      }
+        fetch('/api/review', {
+          method: 'post',
+          body: JSON.stringify(review)
+        }).then(() => {
+          this.review.content = this.review.reviewer = ''
+        })
+        //
+      },
+      subscribe() {
+        let pusher = new Pusher('YOUR_PUSHER_APP_KEY',  {
+          cluster: 'YOUR_CLUSTER'})
+          pusher.subscribe('reviews')
+          pusher.bind('review_added', data => {
+             this.mockReviews.unshift(data.review)
+          })
+        }
     },
     computed: {
       reviews () {
@@ -74,7 +93,8 @@
     created() {
       bus.$on('new_movie', movieId => {
         this.movie = movieId
-      })
+      });
+      this.subscribe()
     }
   }
 </script>
@@ -89,7 +109,7 @@
     padding: 10px;
     margin: 15px 0 5px 0;
   }
-  .review {
+  .review h5{
     text-transform: uppercase;
     font-weight: bolder;
     font-size: 0.7em;

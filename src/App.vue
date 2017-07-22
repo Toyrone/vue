@@ -3,7 +3,7 @@
     <div class="container">
       <div class="heading">
         <h2>Revue</h2>
-        <h6 class="subheader">Real time Movie review with Pusher and Vue.js 2</h6>
+        <h5 class="subheader">A Real-time Movie review with Pusher and Vue.js 2</h5>
       </div>
       <div class="row">
         <div class="col-sm-7">
